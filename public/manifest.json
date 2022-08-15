@@ -10,17 +10,15 @@
     "128": "icons/icon-100.png"
   },
   "action": {
-    "default_popup": "popup/popup.html"
+    "default_popup": "index.html"
   },
   "permissions": [
-    "webNavigation",
     "activeTab",
-    "history",
     "storage"
   ],
-  "host_permissions": [
-    "*://*/*"
-  ],
+  "background": {
+    "service_worker": "background-scripts/background.js"
+  },
   "content_scripts": [
     {
       "matches": [
@@ -29,12 +27,6 @@
       "js": [
         "content-scripts/content.js"
       ]
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "resources": ["images/*.jpeg"],
-      "matches": ["<all_urls>"]
     }
   ]
 }
