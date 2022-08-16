@@ -19,7 +19,12 @@
     "watch": "npm-watch"
   },
   "watch": {
-    "build": "src/"
+    "build": {
+      "patterns": [
+        "src/",
+        "public/"
+      ]
+    }
   },
   "devDependencies": {
     "npm-watch": "^0.11.0"

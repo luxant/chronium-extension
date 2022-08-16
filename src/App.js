@@ -16,12 +16,6 @@ function App() {
     setTabId(tabs[0].id);
   });
 
-  // Events subscription
-
-  chrome.webNavigation.onBeforeNavigate.addListener(e => {
-    console.log(`tab is: ${e.tabId}`, e);
-  });
-
   // Methods
 
   function enableRedireactionForCurrentTab() {
@@ -63,6 +57,7 @@ function App() {
 
       const intervalId = setInterval(() => {
         setRemainingTime((previousValue) => previousValue - 1);
+        console.log(new Date());
       }, 1000);
   
       setSecondsIntervalId(intervalId);
