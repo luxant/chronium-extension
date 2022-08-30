@@ -13,8 +13,8 @@
     "default_popup": "index.html"
   },
   "permissions": [
-    "activeTab",
-    "storage"
+    "background",
+    "activeTab"
   ],
   "background": {
     "service_worker": "background-scripts/background.js"
