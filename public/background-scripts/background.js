@@ -34,9 +34,29 @@ chrome.runtime.onMessage.addListener((message, sender, callback) => {
     case "isEnabled":
       callback(!!intervalId);
       break;
+    case "keepAlive":
+      chrome.tabs.sendMessage(message.tabId, { type: "keepAlive" });
+      break;
   }
 })
 
 function sendRedirectMessage(tabId, url) {
-  chrome.tabs.sendMessage(tabId, { targetUrl: url });
+  chrome.tabs.sendMessage(tabId, {
+    type: "redirect",
+    targetUrl: url 
+  });
 }
+
+chrome.runtime.onInstalled.addListener(async () => {
+
+  console.log(`### background.js - Inserting script  ####`);
+
+  for (const contentScripts of chrome.runtime.getManifest().content_scripts) {
+    for (const tab of await chrome.tabs.query({ url: contentScripts.matches })) {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: contentScripts.js,
+      });
+    }
+  }
+});

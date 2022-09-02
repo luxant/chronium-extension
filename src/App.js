@@ -3,6 +3,7 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 
 const TIME_TO_REFRESH = 3 * 60; // min * sec
+const ENTER_KEY_CODE = 'Enter';
 const TARGET_URL = "https://microsoft.com/devicelogin";
 
 function App() {
@@ -12,10 +13,10 @@ function App() {
   const [inputUserTimeToRefreshValue, setInputUserTimeToRefreshValue] = useState(TIME_TO_REFRESH);
 
   // Load current tab id
-  useEffect(() => {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      setTabId(tabs[0].id);
-    });
+  useEffect(async () => {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+
+    setTabId(tabs[0].id);
   }, []);
 
   // To figure out the state the buttons should be
@@ -27,19 +28,6 @@ function App() {
       setIsExtensionOn(isEnabled);
     });
   }, []);
-
-  // To keep alive the connection between the extension and the content script
-  useEffect(() => {
-    if (!tabId) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      sentKeepAlive();
-    }, 10 * 1000);
-
-    return () => clearInterval(interval);
-  }, [tabId]);
 
   // Methods
 
@@ -63,7 +51,6 @@ function App() {
     setIsExtensionOn(false);
   }
 
-
   function onUserTimeToRefreshInputChange(event) {
     setInputUserTimeToRefreshValue(event.target.value);
 
@@ -73,6 +60,12 @@ function App() {
       setUserTimeToRefresh(parsedValue)
     }
   }
+  
+  function handleKeypress(event) {
+    if (!isExtensionOn && event.key === ENTER_KEY_CODE) {
+      enableRedirectionForCurrentTab();
+    }
+  };
 
   return (
     <>
@@ -87,13 +80,17 @@ function App() {
         disabled={!isExtensionOn}
         >Disable</button>
 
-        <input type="text" placeholder='Enter seconds' className='margin-top' value={inputUserTimeToRefreshValue} onChange={onUserTimeToRefreshInputChange} />
+        <input 
+          type="text"
+          placeholder='Enter seconds'
+          className='margin-top'
+          disabled={isExtensionOn}
+          value={inputUserTimeToRefreshValue}
+          onChange={onUserTimeToRefreshInputChange}
+          onKeyPress={handleKeypress}
+        />
     </>
   );
 }
-
-chrome.runtime.onMessage.addListener(message => {
-  chrome.tabs.sendMessage(message.tabId, message);
-});
 
 export default App;
